@@ -24,13 +24,38 @@ class EventController extends Controller
         $event = new Event;
 
         $event->title = $request->title;
+        $event->date = $request->date;
         $event->city = $request->city;
         $event->private = $request->private;
         $event->description = $request->description;
+        $event->items = $request->items;
+
+        //image Upload
+
+        if($request->hasFile('image') && $request->file('image')->isValid()){
+
+            $requestImage = $request->image;
+
+            $extension = $requestImage->extension();
+
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
+
+            $requestImage->move(public_path('img/events'), $imageName);
+
+            $event->image = $imageName;
+        }
 
         $event->save();
 
-        return redirect('/');
+        return redirect('/')->with('msg', 'Evento criado com sucesso!');
+    }
+
+    public function show($id) {
+        $events = Event::findOrFail($id); //Pega as informações do model(dados do bando de dados) e usao uma função
+                                          // Que se achar o id ele dpa certo, se não a dá erro 404
+
+        return view('events.show', [ 'events' => $events ]); //Aqui, por fim, vai direcionar para o diretório 'events.show'
+                                                             // No qual vai estar toda a estrutura da página que o usuário quer acessar
     }
 
 }
