@@ -9,9 +9,22 @@ use App\Models\Event;
 class EventController extends Controller
 {
     public function index(){
-        $events = Event::all();
 
-        return view('welcome', [  'events' => $events ]); //Aqui nesse Array ele pega a variável e passa para o nome entre '' (aspas simples)
+        $search = request('search');
+
+        if($search){
+
+            $events = Event::where([
+                [ 'title', 'like', '%'.$search.'%' ]
+            ])->get();
+
+
+        } else {
+            $events = Event::all();
+        }
+
+        
+        return view('welcome', [  'events' => $events, 'search'=> $search ]); //Aqui nesse Array ele pega a variável e passa para o nome entre '' (aspas simples)
                                         //E esse nome que será colocado entre chaves lá no blade para aparecer o valor da variável
     }
 
@@ -44,6 +57,9 @@ class EventController extends Controller
 
             $event->image = $imageName;
         }
+
+        $user = auth()->user();
+        $event->user_id = $user->id;
 
         $event->save();
 
