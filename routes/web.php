@@ -13,17 +13,10 @@ Route::get('/events/{id}', [EventController::class, 'show'] ); // rota que vai d
 
 Route::post('/events', [EventController::class, 'store']);
 
+Route::delete('/events/{id}', [EventController::class, 'destroy'] );
+
 Route::get('/events/contacts', [EventController::class, 'contacts'] );
 
+Route::get('/dashboard', [EventController::class, 'dashboard'] )->middleware('auth');
 
 
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-});

@@ -36,14 +36,14 @@
               <li class="nav-item">
                 <form action="/logout" method="POST">
                   @csrf
-                  <a href="/dashboard" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();"
+                  <a href="/logout" class="nav-link" onclick="event.preventDefault(); this.closest('form').submit();"
                   >
                   Sair</a>
                 </form>
               </li>
 
               <li class="nav-item">
-                <a href="/login" class="nav-link">Entrar</a>
+                <a href="/dashboard" class="nav-link">Meus eventos</a>
               </li>
               @endauth
               @guest

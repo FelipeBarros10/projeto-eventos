@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Models\Event;
 
+use App\Models\User;
+
 class EventController extends Controller
 {
     public function index(){
@@ -36,7 +38,7 @@ class EventController extends Controller
         
         $event = new Event;
 
-        $event->title = $request->title;
+        $event->title = $request->title; 
         $event->date = $request->date;
         $event->city = $request->city;
         $event->private = $request->private;
@@ -45,23 +47,24 @@ class EventController extends Controller
 
         //image Upload
 
-        if($request->hasFile('image') && $request->file('image')->isValid()){
+        if($request->hasFile('image') && $request->file('image')->isValid()){ // Verifica se a requisição possui imagem e se ela é válida
 
-            $requestImage = $request->image;
+            $requestImage = $request->image; //Variável que armazena a imagem da requisição
 
-            $extension = $requestImage->extension();
+            $extension = $requestImage->extension(); //Variável que armazena a extensão(jpg,png, etc) imagem da requisição
 
-            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension; // hash criada a partir do nome original do arquivo
+                                                                                                            // e do timestamp atual seguido pela extensão concatenando com um "."
 
-            $requestImage->move(public_path('img/events'), $imageName);
+            $requestImage->move(public_path('img/events'), $imageName); //Move a imagem para a pasta publica, especificamente na pasta events dentro da pasta img
 
-            $event->image = $imageName;
+            $event->image = $imageName; // Passando para a coluna image da tabela o nome da imagem criado na Hash
         }
 
-        $user = auth()->user();
-        $event->user_id = $user->id;
+        $user = auth()->user(); //Variável que vai receber o usuário autenticado
+        $event->user_id = $user->id; //Coluna 'user_id' da tabela de eventos recebe o id da varivél user
 
-        $event->save();
+        $event->save();// Salva a instância no banco de dados (Assim que o usuário criar o evento, será enviado ao banco o ID dele junto com o evento criado)
 
         return redirect('/')->with('msg', 'Evento criado com sucesso!');
     }
@@ -70,8 +73,27 @@ class EventController extends Controller
         $events = Event::findOrFail($id); //Pega as informações do model(dados do bando de dados) e usao uma função
                                           // Que se achar o id ele dpa certo, se não a dá erro 404
 
-        return view('events.show', [ 'events' => $events ]); //Aqui, por fim, vai direcionar para o diretório 'events.show'
+        $eventOwner = User::where('id', $events->user_id)->first()->toArray(); //Variável que recebe uma consulta na tabela de usuários onde o id do usuário
+                                                                               //for do mesmo usuário da tabela de eventos(que criou o evento), ele vai pegar o primeiro  e tranformar em array
+
+        return view('events.show', [ 'events' => $events, 'eventOwner' => $eventOwner ]); //Aqui, por fim, vai direcionar para o diretório 'events.show'
                                                              // No qual vai estar toda a estrutura da página que o usuário quer acessar
+    }
+
+    public function dashboard () {
+        $user = auth()->user(); //Variável que vai receber o usuário autenticado
+
+        $eventsOfUser = $user->events; //Variável que vai receber a  relação feita no model de usuário (Um usuário tem muitos eventos)
+
+        return view('events.dashboard', [ 'eventsOfUser' => $eventsOfUser ]);
+
+    }
+
+    public function destroy($id){
+
+        Event::findOrFail($id)->delete();
+
+        return redirect('/dashboard')->with('msg', 'Evento excluído com sucesso!');
     }
 
 }
