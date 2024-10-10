@@ -12,10 +12,12 @@
       <div id="info-container" class="col-md-6">
         <h1>{{ $events->title }}</h1>
         <p class="event-city"><i class="bi bi-geo-alt-fill"></i> {{ $events->city }}</p>
-        <p class="events-participants"><i class="bi bi-people-fill"></i> X Participantes</p>
+        <p class="events-participants"><i class="bi bi-people-fill"></i> {{ count($events->users) }} Participantes</p>
         <p class="event-owner"><i class="bi bi-star"></i> {{ $eventOwner['name'] }}</p>
-        <a href="#" class="btn btn-primary" id="event-submit">Confirmar Presença</a>
-
+        <form action="/events/join/{{ $events->id }}" method="POST">
+          @csrf
+          <a href="events/join/{{ $events->id }}" onclick="event.preventDefault(); this.closest('form').submit();" class="btn btn-primary" id="event-submit">Confirmar Presença</a>
+        </form>
         <h3>O evento conta com:</h3>
         <ul id="items-list">
           @foreach($events->items as $item)

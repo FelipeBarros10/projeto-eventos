@@ -20,4 +20,6 @@ Route::put('/events/update/{id}', [EventController::class, 'update'] )->middlewa
 
 Route::get('/dashboard', [EventController::class, 'dashboard'] )->middleware('auth');
 
+Route::post('/events/join/{id}', [EventController::class, 'joinEvent'])->middleware('auth');
+
 

@@ -85,7 +85,9 @@ class EventController extends Controller
 
         $eventsOfUser = $user->events; //Variável que vai receber a  relação feita no model de usuário (Um usuário tem muitos eventos)
 
-        return view('events.dashboard', [ 'eventsOfUser' => $eventsOfUser ]);
+        $eventsParticipants = $user->eventsAsParticipants;
+
+        return view('events.dashboard', [ 'eventsOfUser' => $eventsOfUser, 'eventsParticipants' => $eventsParticipants ]);
 
     }
 
@@ -97,6 +99,12 @@ class EventController extends Controller
     }
 
     public function edit($id){
+
+        $user = auth()->user();
+
+        if($user->id != $events->user_id){
+            return redirect('/dashboard');
+        }
 
         $events = Event::findOrFail($id);
 
@@ -125,6 +133,19 @@ class EventController extends Controller
         Event::findOrFail($request->id)->update($data);
 
         return redirect('/dashboard')->with('msg', 'Evento editado com sucesso!');
+
+    }
+
+    public function joinEvent($id){
+
+        $user = auth()->user();
+        
+        $user->eventsAsParticipants()->attach($id);
+
+        $events = Event::findOrFail($id);
+
+        return redirect('/dashboard')->with('msg', 'Sua Presença está confirmada no evento' . $events->title);
+
 
     }
 
