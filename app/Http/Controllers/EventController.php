@@ -73,10 +73,25 @@ class EventController extends Controller
         $events = Event::findOrFail($id); //Pega as informações do model(dados do bando de dados) e usao uma função
                                           // Que se achar o id ele dpa certo, se não a dá erro 404
 
+        $user = auth()->user();
+        $hasUserJoined = false;
+
+            if($user){
+
+                $userEvents = $user->eventsAsParticipants->toArray();
+
+                foreach($userEvents as $userEvent){
+                    if($userEvent['id'] == $id){
+                        $hasUserJoined = true;
+                    }
+                }
+
+            }
+
         $eventOwner = User::where('id', $events->user_id)->first()->toArray(); //Variável que recebe uma consulta na tabela de usuários onde o id do usuário
                                                                                //for do mesmo usuário da tabela de eventos(que criou o evento), ele vai pegar o primeiro  e tranformar em array
 
-        return view('events.show', [ 'events' => $events, 'eventOwner' => $eventOwner ]); //Aqui, por fim, vai direcionar para o diretório 'events.show'
+        return view('events.show', [ 'events' => $events, 'eventOwner' => $eventOwner, 'hasUserJoined'=> $hasUserJoined ]); //Aqui, por fim, vai direcionar para o diretório 'events.show'
                                                              // No qual vai estar toda a estrutura da página que o usuário quer acessar
     }
 
@@ -146,6 +161,18 @@ class EventController extends Controller
 
         return redirect('/dashboard')->with('msg', 'Sua Presença está confirmada no evento' . $events->title);
 
+
+    }
+
+    public function leavingEvent($id){
+
+        $user = auth()->user();
+
+        $user->eventsAsParticipants()->detach($id);
+
+        $events = Event::findOrFail($id);
+
+        return redirect('/dashboard')->with('msg', 'Sua Presença foi removida do evento' . $events->title);
 
     }
 

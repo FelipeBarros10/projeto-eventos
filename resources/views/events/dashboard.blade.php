@@ -61,7 +61,12 @@
                 <td><a href="/events/{{ $event->id }}">{{ $event->title }}</a></td>
                 <td>{{ count($event->users) }}</td>
                 <td>
-                    <a href="#">Sair do evento</a>
+                    <form action="/events/leave/{{ $event->id }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger delete-btn"><i class="bi bi-trash-fill"></i>Sair do Evento</button>
+                    </form>
+                    
                 </td>
             </tr>
         @endforeach    

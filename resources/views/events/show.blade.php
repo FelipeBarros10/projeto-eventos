@@ -14,10 +14,16 @@
         <p class="event-city"><i class="bi bi-geo-alt-fill"></i> {{ $events->city }}</p>
         <p class="events-participants"><i class="bi bi-people-fill"></i> {{ count($events->users) }} Participantes</p>
         <p class="event-owner"><i class="bi bi-star"></i> {{ $eventOwner['name'] }}</p>
+        @if($hasUserJoined)
+        <p class="already-joined-msg" >Preseça já confirmada</p>
+
+        @else
         <form action="/events/join/{{ $events->id }}" method="POST">
           @csrf
           <a href="events/join/{{ $events->id }}" onclick="event.preventDefault(); this.closest('form').submit();" class="btn btn-primary" id="event-submit">Confirmar Presença</a>
         </form>
+        @endif
+        
         <h3>O evento conta com:</h3>
         <ul id="items-list">
           @foreach($events->items as $item)
