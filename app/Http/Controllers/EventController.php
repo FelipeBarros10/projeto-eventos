@@ -117,11 +117,11 @@ class EventController extends Controller
 
         $user = auth()->user();
 
+        $events = Event::findOrFail($id);
+
         if($user->id != $events->user_id){
             return redirect('/dashboard');
         }
-
-        $events = Event::findOrFail($id);
 
         return view('events.edit', [ 'events' => $events ]);
     }

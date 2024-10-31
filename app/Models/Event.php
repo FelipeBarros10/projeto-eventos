@@ -12,6 +12,7 @@ class Event extends Model
     protected $casts = [
         'items' => 'array'
     ];
+    
 
     protected $guarded = [];
 
